@@ -13,9 +13,9 @@
     mode: put
   register: s3_create_folder_result
 
-  - name: Show result of folder creation
-    ansible.builtin.debug:
-      var: s3_create_folder_result
+- name: Show result of folder creation
+  ansible.builtin.debug:
+    var: s3_create_folder_result
 
   # ansible.builtin.template:
   #   src: templates/awx-operator/kustomization.j2
