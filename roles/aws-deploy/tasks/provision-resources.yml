@@ -11,6 +11,7 @@
     object: "{{ aws_s3_project_name }}/"  # The 'key' for the folder, ends with '/'
     region: "{{ ec2_region }}"
     mode: put
+    content: ""
   register: s3_create_folder_result
 
 - name: Show result of folder creation
