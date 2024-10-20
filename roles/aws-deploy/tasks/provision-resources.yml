@@ -1,9 +1,9 @@
 ---
 
-# - name: Retrieve the current time in order to timestamp files
-#   ansible.builtin.setup:
-#     gather_subset:
-#      - date_time
+- name: Retrieve the current time in order to timestamp files
+  ansible.builtin.setup:
+    gather_subset:
+     - date_time
 
 - name: Add a timestamped file to my S3 Bucket
   amazon.aws.s3_object:
