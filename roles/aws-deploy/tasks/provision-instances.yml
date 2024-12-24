@@ -143,7 +143,7 @@
     count: 1
     wait: "{{ ec2_wait }}"
     vpc_subnet_id: "{{ subnet_info.subnets[0].id }}"
-    instance_tags:
+    tags:
       provisioner: mford
       application: "{{ application }}"
       Name: "{{ application }}-webserver"
@@ -170,7 +170,7 @@
     count: "{{ num_instances }}"
     wait: "{{ ec2_wait }}"
     vpc_subnet_id: "{{ subnet_info.subnets[0].id }}"
-    instance_tags:
+    tags:
       provisioner: mford
       application: "{{ application }}"
       Name: "{{ application }}-server"
