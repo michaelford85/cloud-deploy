@@ -65,9 +65,9 @@
 - name: Change mode for local private key file
   ansible.builtin.file:
     path: "{{ private_key_path }}"
-    mode: '0644'
+    mode: '0600'
   when: create_key.changed
-  
+
 # - name: Derive Public Key from Private Key
 #   ansible.builtin.command: "ssh-keygen -y -f {{ working_dir }}/{{ ec2_prefix }}-key-private.pem"
 #   register: pubkey_output
