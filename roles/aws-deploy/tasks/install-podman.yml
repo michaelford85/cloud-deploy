@@ -34,19 +34,19 @@
         - docker-ce-cli
 
   - name: Uninstall the latest available containerd.io package manually
-    ansible.builtin.yum:
+    ansible.builtin.dnf:
       name: containerd.io-1.2.6-3.3.el7.x86_64
       state: removed
     become: yes
 
   - name: install the 'Container tools' package group
-    ansible.builtin.yum:
+    ansible.builtin.dnf:
       name: "@container-tools"
       state: present
     become: yes
 
   - name: install the podman-docker package group
-    ansible.builtin.yum:
+    ansible.builtin.dnf:
       name: podman-docker
       state: present
     become: yes
