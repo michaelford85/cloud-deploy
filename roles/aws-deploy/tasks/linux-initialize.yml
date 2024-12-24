@@ -3,7 +3,7 @@
   - name: Wait for instances to be reachable
     ansible.builtin.wait_for_connection:
       sleep: 5
-      timeout: 600
+      timeout: 1000
 
   - name: Install epel-release package
     ansible.builtin.dnf:
