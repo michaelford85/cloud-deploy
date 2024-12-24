@@ -29,50 +29,50 @@
     name: "{{ ec2_prefix }}-key"
   register: create_key
 
-# This is just saving off the private key, this can only be done 1 time on the first creation of the key, pair
-# - name: Save Private Key Locally
-#   ansible.builtin.copy:
+# # This is just saving off the private key, this can only be done 1 time on the first creation of the key, pair
+# # - name: Save Private Key Locally
+# #   ansible.builtin.copy:
+# #     content: "{{ create_key.key.private_key }}"
+# #     dest: "{{ working_dir }}/{{ ec2_prefix }}-key-private.pem"
+# #     mode: '0600'
+# #   when: create_key.changed
+# #   no_log: yes
+
+# - name: Save Private Key to S3 Bucket
+#   amazon.aws.s3_object:
+#     bucket: "{{ aws_s3_bucket}}"
+#     object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
 #     content: "{{ create_key.key.private_key }}"
-#     dest: "{{ working_dir }}/{{ ec2_prefix }}-key-private.pem"
-#     mode: '0600'
+#     mode: put
+#   register: upload_result
 #   when: create_key.changed
+#   # no_log: yes
+
+# - name: Define temporary file paths
+#   ansible.builtin.set_fact:
+#     private_key_path: "/runner/{{ ec2_prefix }}-key-private.pem"
+#     public_key_path: "/runner/{{ ec2_prefix }}-key.pub"
+
+# - name: Download Private Key from S3
+#   amazon.aws.s3_object:
+#     bucket: "{{ aws_s3_bucket }}"
+#     object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
+#     dest: "{{ private_key_path }}"
+#     mode: get
+#   register: download_result
 #   no_log: yes
 
-- name: Save Private Key to S3 Bucket
-  amazon.aws.s3_object:
-    bucket: "{{ aws_s3_bucket}}"
-    object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
-    content: "{{ create_key.key.private_key }}"
-    mode: put
-  register: upload_result
-  when: create_key.changed
-  # no_log: yes
-
-- name: Define temporary file paths
-  ansible.builtin.set_fact:
-    private_key_path: "/runner/{{ ec2_prefix }}-key-private.pem"
-    public_key_path: "/runner/{{ ec2_prefix }}-key.pub"
-
-- name: Download Private Key from S3
-  amazon.aws.s3_object:
-    bucket: "{{ aws_s3_bucket }}"
-    object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
-    dest: "{{ private_key_path }}"
-    mode: get
-  register: download_result
-  no_log: yes
-
-# - name: Derive Public Key from Private Key
-#   ansible.builtin.command: "ssh-keygen -y -f {{ working_dir }}/{{ ec2_prefix }}-key-private.pem"
-#   register: pubkey_output
-#   when: create_key.changed
-#   no_log: yes
+# # - name: Derive Public Key from Private Key
+# #   ansible.builtin.command: "ssh-keygen -y -f {{ working_dir }}/{{ ec2_prefix }}-key-private.pem"
+# #   register: pubkey_output
+# #   when: create_key.changed
+# #   no_log: yes
 
 - name: Derive Public Key from Private Key
   ansible.builtin.command: "ssh-keygen -y -f {{ private_key_path }} > {{ public_key_path }}"
   register: pubkey_output
   when: create_key.changed
-  no_log: yes
+  # no_log: yes
 
 # - name: Save Public Key Locally
 #   ansible.builtin.copy:
