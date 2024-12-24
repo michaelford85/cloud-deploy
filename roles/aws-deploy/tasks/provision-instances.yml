@@ -41,7 +41,7 @@
 - name: Save Private Key to S3 Bucket
   amazon.aws.s3_object:
     bucket: "{{ aws_s3_bucket}}"
-    object_key: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
+    object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
     content: "{{ create_key.key.private_key }}"
     mode: put
   register: upload_result
@@ -56,7 +56,7 @@
 - name: Download Private Key from S3
   amazon.aws.s3_object:
     bucket: "{{ aws_s3_bucket }}"
-    object_key: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
+    object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
     dest: "{{ private_key_path }}"
     mode: get
   register: download_result
@@ -85,7 +85,7 @@
 - name: Save Public Key to S3 Bucket
   amazon.aws.s3_object:
     bucket: "{{ aws_s3_bucket}}"
-    object_key: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key.pub"
+    object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key.pub"
     content: "{{ pubkey_output.stdout }}"
     mode: put
   register: upload_result
