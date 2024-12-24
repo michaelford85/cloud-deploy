@@ -45,7 +45,7 @@
     content: "{{ create_key.key.private_key }}"
   register: upload_result
   when: create_key.changed
-  no_log: yes
+  # no_log: yes
 
 - name: Define temporary file paths
   ansible.builtin.set_fact:
