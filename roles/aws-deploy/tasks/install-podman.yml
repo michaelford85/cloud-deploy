@@ -55,9 +55,11 @@
     ansible.builtin.systemd_service:
       name: podman
       enabled: true
+    become: yes
 
-  - name: Enable the Podman service
+  - name: Start the Podman service
     ansible.builtin.systemd_service:
       name: podman
       state: started
+    become: yes
   when: tags.group == "webserver"
