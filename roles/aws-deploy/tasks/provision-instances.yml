@@ -108,7 +108,7 @@
 - name: Update AWX Cloud SSH Credential
   awx.awx.credential:
     name: Cloud Demo Instances Key
-    organization: "Cloud Organization"
+    # organization: "Cloud Organization"
     controller_host: "{{ tower_url }}"
     controller_username: "{{ tower_user }}"
     controller_password: "{{ tower_pass }}"
