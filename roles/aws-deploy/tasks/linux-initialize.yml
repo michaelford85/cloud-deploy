@@ -26,12 +26,29 @@
     become: yes
     when: tags.cloud_provider == "aws"
 
-  - name: Install package ansible
+
+  - name: Ensure Python and pip are installed
     ansible.builtin.dnf:
+      name: 
+        - python3
+        - python3-pip
       state: present
-      name: ansible-core
     become: yes
     when: tags.cloud_provider == "aws"
+
+  - name: Install ansible-core via pip
+    ansible.builtin.pip:
+      name: ansible-core
+      state: present
+    become: yes
+    when: tags.cloud_provider == "aws"
+
+  # - name: Install package ansible
+  #   ansible.builtin.dnf:
+  #     state: present
+  #     name: ansible-core
+  #   become: yes
+  #   when: tags.cloud_provider == "aws"
 
   # - name: Install subscription-manager
   #   ansible.builtin.yum:
