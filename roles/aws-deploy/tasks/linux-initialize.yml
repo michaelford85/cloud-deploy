@@ -13,11 +13,9 @@
     when: tags.cloud_provider == "aws"
 
   - name: Enable EPEL repository explicitly (if required)
-    ansible.builtin.command: dnf config-manager --set-enabled epel
-    args:
-      warn: false
+    ansible.builtin.shell: dnf config-manager --set-enabled epel
     register: epel_enabled
-    changed_when: "'enabled:True' not in epel_enabled.stdout"
+    changed_when: "'enabled: True' in epel_enabled.stdout"
     become: yes
     when: tags.cloud_provider == "aws"
 
