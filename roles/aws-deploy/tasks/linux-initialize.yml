@@ -5,6 +5,13 @@
       sleep: 5
       timeout: 1000
 
+  - name: Upgrade all packages
+    ansible.builtin.dnf:
+      name: "*"
+      state: latest
+    become: yes
+    when: tags.cloud_provider == "aws"
+    
   - name: Install epel-release package
     ansible.builtin.dnf:
       name: epel-release

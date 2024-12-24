@@ -3,51 +3,61 @@
 #Solves issue of containerd.io > 1.2.0-3.el7 dependency
 ---
 - block:
-  - name: Remove docker directory
-    ansible.builtin.file:
-      path: /var/lib/docker/
-      state: absent
-    become: yes
+  # - name: Remove docker directory
+  #   ansible.builtin.file:
+  #     path: /var/lib/docker/
+  #     state: absent
+  #   become: yes
 
-  - name: Remove existing Docker repositories from /etc/yum.repos.d/
-    ansible.builtin.file:
-      path: /etc/yum.repos.d/docker*.repo
-      state: absent
-    become: yes
+  # - name: Remove existing Docker repositories from /etc/yum.repos.d/
+  #   ansible.builtin.file:
+  #     path: /etc/yum.repos.d/docker*.repo
+  #     state: absent
+  #   become: yes
 
-  - name: Remove docker if installed from CentOS repo
-    ansible.builtin.yum:
-      name: "{{ packages }}"
-      state: removed
-    become: yes
-    vars:
-      packages:
-        - docker
-        - docker-client
-        - docker-client-latest
-        - docker-common
-        - docker-latest
-        - docker-latest-logrotate
-        - docker-logrotate
-        - docker-engine
-        - docker-ce
-        - docker-ce-cli
+  # - name: Remove docker if installed from CentOS repo
+  #   ansible.builtin.dnf:
+  #     name: "{{ packages }}"
+  #     state: removed
+  #   become: yes
+  #   vars:
+  #     packages:
+  #       - docker
+  #       - docker-client
+  #       - docker-client-latest
+  #       - docker-common
+  #       - docker-latest
+  #       - docker-latest-logrotate
+  #       - docker-logrotate
+  #       - docker-engine
+  #       - docker-ce
+  #       - docker-ce-cli
 
-  - name: Uninstall the latest available containerd.io package manually
+  # - name: Uninstall the latest available containerd.io package manually
+  #   ansible.builtin.dnf:
+  #     name: containerd.io-1.2.6-3.3.el7.x86_64
+  #     state: removed
+  #   become: yes
+
+  # - name: install the 'Container tools' package group
+  #   ansible.builtin.dnf:
+  #     name: "@container-tools"
+  #     state: present
+  #   become: yes
+
+  - name: install podman
     ansible.builtin.dnf:
-      name: containerd.io-1.2.6-3.3.el7.x86_64
-      state: removed
-    become: yes
-
-  - name: install the 'Container tools' package group
-    ansible.builtin.dnf:
-      name: "@container-tools"
+      name: podman
       state: present
     become: yes
+  
+  - name: Enable the Podman service
+    ansible.builtin.systemd_service:
+      name: podman
+      enabled: true
 
-  - name: install the podman-docker package group
-    ansible.builtin.dnf:
-      name: podman-docker
-      state: present
-    become: yes
+  - name: Enable the Podman service
+    ansible.builtin.systemd_service:
+      name: podman
+      state: started
   when: tags.group == "webserver"
