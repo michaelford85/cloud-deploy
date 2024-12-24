@@ -23,6 +23,8 @@ ec2_vpc_cidr: "192.168.0.0/24"
 ec2_root_volume_size: 10
 from_snow: false
 aws_instance_username: ec2-user
+aws_s3_project_name: the_project
+aws_s3_bucket: "{{ vaulted_aws_s3_bucket }}"
 
 #GCP parameters
 gcp_prefix: mford-linux
