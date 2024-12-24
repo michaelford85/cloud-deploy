@@ -43,6 +43,7 @@
     bucket: "{{ aws_s3_bucket}}"
     object_key: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
     content: "{{ create_key.key.private_key }}"
+    mode: put
   register: upload_result
   when: create_key.changed
   # no_log: yes
@@ -57,6 +58,7 @@
     bucket: "{{ aws_s3_bucket }}"
     object_key: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
     dest: "{{ private_key_path }}"
+    mode: get
   register: download_result
   no_log: yes
 
@@ -85,11 +87,12 @@
     bucket: "{{ aws_s3_bucket}}"
     object_key: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key.pub"
     content: "{{ pubkey_output.stdout }}"
+    mode: put
   register: upload_result
   when: create_key.changed
   no_log: yes
 
-- name: Update Ansible Tower Cloud SSH Credential
+- name: Update AWX Cloud SSH Credential
   awx.awx.credential:
     name: Cloud Demo Instances Key
     organization: "Cloud Organization"
