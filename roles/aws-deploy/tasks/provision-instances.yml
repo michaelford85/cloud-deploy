@@ -30,30 +30,67 @@
   register: create_key
 
 # This is just saving off the private key, this can only be done 1 time on the first creation of the key, pair
-- name: Save Private Key Locally
-  ansible.builtin.copy:
+# - name: Save Private Key Locally
+#   ansible.builtin.copy:
+#     content: "{{ create_key.key.private_key }}"
+#     dest: "{{ working_dir }}/{{ ec2_prefix }}-key-private.pem"
+#     mode: '0600'
+#   when: create_key.changed
+#   no_log: yes
+
+- name: Save Private Key to S3 Bucket
+  amazon.aws.s3_object:
+    bucket: "{{ aws_s3_bucket}}"
+    object_key: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
     content: "{{ create_key.key.private_key }}"
-    dest: "{{ working_dir }}/{{ ec2_prefix }}-key-private.pem"
-    mode: '0600'
+  register: upload_result
   when: create_key.changed
   no_log: yes
 
+- name: Define temporary file paths
+  ansible.builtin.set_fact:
+    private_key_path: "/runner/{{ ec2_prefix }}-key-private.pem"
+    public_key_path: "/runner/{{ ec2_prefix }}-key.pub"
+
+- name: Download Private Key from S3
+  amazon.aws.s3_object:
+    bucket: "{{ aws_s3_bucket }}"
+    object_key: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
+    dest: "{{ private_key_path }}"
+  register: download_result
+  no_log: yes
+
+# - name: Derive Public Key from Private Key
+#   ansible.builtin.command: "ssh-keygen -y -f {{ working_dir }}/{{ ec2_prefix }}-key-private.pem"
+#   register: pubkey_output
+#   when: create_key.changed
+#   no_log: yes
+
 - name: Derive Public Key from Private Key
-  ansible.builtin.command: "ssh-keygen -y -f {{ working_dir }}/{{ ec2_prefix }}-key-private.pem"
+  ansible.builtin.command: "ssh-keygen -y -f {{ private_key_path }} > {{ public_key_path }}"
   register: pubkey_output
   when: create_key.changed
   no_log: yes
 
-- name: Save Public Key Locally
-  ansible.builtin.copy:
+# - name: Save Public Key Locally
+#   ansible.builtin.copy:
+#     content: "{{ pubkey_output.stdout }}"
+#     dest: "{{ working_dir }}/{{ ec2_prefix }}-key.pub"
+#     mode: '0400'
+#   when: create_key.changed
+#   no_log: yes
+
+- name: Save Public Key to S3 Bucket
+  amazon.aws.s3_object:
+    bucket: "{{ aws_s3_bucket}}"
+    object_key: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key.pub"
     content: "{{ pubkey_output.stdout }}"
-    dest: "{{ working_dir }}/{{ ec2_prefix }}-key.pub"
-    mode: '0400'
+  register: upload_result
   when: create_key.changed
   no_log: yes
 
 - name: Update Ansible Tower Cloud SSH Credential
-  ansible.controller.credential:
+  awx.awx.credential:
     name: Cloud Demo Instances Key
     organization: "Cloud Organization"
     controller_host: "{{ tower_url }}"
@@ -62,7 +99,8 @@
     credential_type: "Machine"
     inputs:
       username: "{{ aws_instance_username }}"
-      ssh_key_data: "{{ lookup('file', '{{ working_dir }}/{{ ec2_prefix }}-key-private.pem') }}"
+      # ssh_key_data: "{{ lookup('file', '{{ working_dir }}/{{ ec2_prefix }}-key-private.pem') }}"
+      ssh_key_data: "{{ lookup('file', '{{ private_key_path }}') }}"
     validate_certs: no
   delegate_to: localhost
   run_once: true
