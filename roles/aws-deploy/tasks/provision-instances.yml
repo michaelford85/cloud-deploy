@@ -136,9 +136,9 @@
     network_interfaces:
       - assign_public_ip: true
     key_name: "{{ ec2_prefix }}-key"
-    group: "{{ ec2_prefix }}-sg"
+    security_group: "{{ ec2_prefix }}-sg"
     instance_type: t2.medium
-    image: "{{ ec2_image_id }}"
+    image_id: "{{ ec2_image_id }}"
     region: "{{ ec2_region }}"
     count: 1
     wait: "{{ ec2_wait }}"
@@ -164,9 +164,9 @@
     network_interfaces:
       - assign_public_ip: true
     key_name: "{{ ec2_prefix }}-key"
-    group: "{{ ec2_prefix }}-sg"
+    security_group: "{{ ec2_prefix }}-sg"
     instance_type: "{{ machine_type }}"
-    image: "{{ ec2_image_id }}"
+    image_id: "{{ ec2_image_id }}"
     region: "{{ ec2_region }}"
     count: "{{ num_instances }}"
     wait: "{{ ec2_wait }}"
