@@ -1,13 +1,13 @@
 ---
 - block:
 
-  - name: Install insights-client
-    ansible.builtin.yum:
-      name: "{{ packages }}"
-    vars:
-      packages:
-      - insights-client
-    become: yes
+  # - name: Install insights-client
+  #   ansible.builtin.yum:
+  #     name: "{{ packages }}"
+  #   vars:
+  #     packages:
+  #     - insights-client
+  #   become: yes
 
   # - name: upgrade all packages
   #   yum:
@@ -26,7 +26,7 @@
   #   ansible.builtin.command: insights-client --register
   #   become: yes
 
-  - name: build report
-    ansible.builtin.include_role:
-      name: build_report
+  # - name: build report
+  #   ansible.builtin.include_role:
+  #     name: build_report
   when: tags.group == "rhel"
