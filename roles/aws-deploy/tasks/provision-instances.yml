@@ -69,7 +69,7 @@
 #   no_log: yes
 
 - name: Derive Public Key from Private Key
-  ansible.builtin.command: "ssh-keygen -y -f {{ private_key_path }} > {{ public_key_path }}"
+  ansible.builtin.shell: "ssh-keygen -y -f {{ private_key_path }} > {{ public_key_path }}"
   register: pubkey_output
   when: create_key.changed
   # no_log: yes
