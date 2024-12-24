@@ -75,7 +75,7 @@
 #   no_log: yes
 
 - name: Derive Public Key from Private Key
-  ansible.builtin.shell: "ssh-keygen -y -f {{ private_key_path }} > {{ public_key_path }}"
+  ansible.builtin.command: "ssh-keygen -y -f {{ private_key_path }}"
   register: pubkey_output
   when: create_key.changed
   # no_log: yes
@@ -87,6 +87,13 @@
 #     mode: '0400'
 #   when: create_key.changed
 #   no_log: yes
+
+- name: Save Public Key Locally
+  ansible.builtin.copy:
+    content: "{{ pubkey_output.stdout }}"
+    dest: "{{ public_key_path }}"
+    mode: '0400'
+  when: create_key.changed
 
 - name: Save Public Key to S3 Bucket
   amazon.aws.s3_object:
