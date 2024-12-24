@@ -46,6 +46,7 @@
         object: snow-change-request.yml
         src: "{{ working_dir }}/snow-change-request.yml"
         mode: put
+      when: from_snow|bool
 
     - name: Print out Change Request number
       ansible.builtin.debug:
