@@ -6,7 +6,7 @@
     - ./credentials/gmail_creds.yml
     - ./vars/default-vars.yml
   collections:
-    - servicenow.servicenow
+    - servicenow.itsm
 
   tasks:
     - name: Create ServiceNow Change Request
