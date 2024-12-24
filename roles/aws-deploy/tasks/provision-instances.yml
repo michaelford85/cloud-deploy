@@ -28,15 +28,7 @@
     region: "{{ ec2_region }}"
     name: "{{ ec2_prefix }}-key"
   register: create_key
-
-# This is just saving off the private key, this can only be done 1 time on the first creation of the key, pair
-# - name: Save Private Key Locally
-#   ansible.builtin.copy:
-#     content: "{{ create_key.key.private_key }}"
-#     dest: "{{ working_dir }}/{{ ec2_prefix }}-key-private.pem"
-#     mode: '0600'
-#   when: create_key.changed
-#   no_log: yes
+  no_log: yes
 
 - name: Save Private Key to S3 Bucket
   amazon.aws.s3_object:
@@ -46,7 +38,7 @@
     mode: put
   register: upload_result
   when: create_key.changed
-  # no_log: yes
+  no_log: yes
 
 - name: Define temporary file paths
   ansible.builtin.set_fact:
@@ -67,26 +59,13 @@
     path: "{{ private_key_path }}"
     mode: '0600'
   when: create_key.changed
-
-# - name: Derive Public Key from Private Key
-#   ansible.builtin.command: "ssh-keygen -y -f {{ working_dir }}/{{ ec2_prefix }}-key-private.pem"
-#   register: pubkey_output
-#   when: create_key.changed
-#   no_log: yes
+  no_log: yes
 
 - name: Derive Public Key from Private Key
   ansible.builtin.command: "ssh-keygen -y -f {{ private_key_path }}"
   register: pubkey_output
   when: create_key.changed
-  # no_log: yes
-
-# - name: Save Public Key Locally
-#   ansible.builtin.copy:
-#     content: "{{ pubkey_output.stdout }}"
-#     dest: "{{ working_dir }}/{{ ec2_prefix }}-key.pub"
-#     mode: '0400'
-#   when: create_key.changed
-#   no_log: yes
+  no_log: yes
 
 - name: Save Public Key Locally
   ansible.builtin.copy:
@@ -94,6 +73,7 @@
     dest: "{{ public_key_path }}"
     mode: '0400'
   when: create_key.changed
+  no_log: yes
 
 - name: Save Public Key to S3 Bucket
   amazon.aws.s3_object:
@@ -108,14 +88,12 @@
 - name: Update AWX Cloud SSH Credential
   awx.awx.credential:
     name: Cloud Demo Instances Key
-    # organization: "Cloud Organization"
     controller_host: "{{ tower_url }}"
     controller_username: "{{ tower_user }}"
     controller_password: "{{ tower_pass }}"
     credential_type: "Machine"
     inputs:
       username: "{{ aws_instance_username }}"
-      # ssh_key_data: "{{ lookup('file', '{{ working_dir }}/{{ ec2_prefix }}-key-private.pem') }}"
       ssh_key_data: "{{ lookup('file', '{{ private_key_path }}') }}"
     validate_certs: no
   delegate_to: localhost
