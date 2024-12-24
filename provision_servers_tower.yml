@@ -5,6 +5,7 @@
   vars_files:
     - ./vars/default-vars.yml
     - ./credentials/tower_creds.yml
+    - ./credentials/aws_resources.yml
 
   tasks:
 
