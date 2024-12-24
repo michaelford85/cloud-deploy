@@ -170,7 +170,7 @@ Note that you can set a different python virtual environment (called *Ansible En
 |  Inventory |  Demo Inventory |
 |  Project |  Deploy Cloud Applications |
 |  Playbook |  `snow-cr-open-and-wait.yml` |
-|  Credential |  `ansible-vault password` |
+|  Credential |  `ansible-vault password`, `AWS Programmatic Key`, `GCP Programmatic Key` |
 
 ### Provision Cloud resources
 
