@@ -116,8 +116,9 @@
 
 
 - name: "Create ec2 secrets engine instance"
-  amazon.aws.ec2:
-    assign_public_ip: true
+  amazon.aws.ec2_instance:
+    network_interfaces:
+      - assign_public_ip: true
     key_name: "{{ ec2_prefix }}-key"
     group: "{{ ec2_prefix }}-sg"
     instance_type: t2.medium
@@ -142,8 +143,9 @@
 
 
 - name: "Create EC2 instances for {{ application }}"
-  amazon.aws.ec2:
-    assign_public_ip: true
+  amazon.aws.ec2_instance:
+    network_interfaces:
+      - assign_public_ip: true
     key_name: "{{ ec2_prefix }}-key"
     group: "{{ ec2_prefix }}-sg"
     instance_type: "{{ machine_type }}"
