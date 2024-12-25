@@ -34,6 +34,26 @@
     #     state: started
     #     restart_policy: always
 
-    - name: Create vault container
-      ansible.builtin.shell: "podman run --cap-add=IPC_LOCK -d -e 'VAULT_DEV_ROOT_TOKEN_ID={{ vault_root_token }}' -p 8200:8200 --name=dev-vault docker.io/hashicorp/vault:1.18 /bin/sh -c 'vault server -dev & tail -f /dev/null'"
+    # - name: Create vault container
+    #   ansible.builtin.shell: "podman run --cap-add=IPC_LOCK -d -e 'VAULT_DEV_ROOT_TOKEN_ID={{ vault_root_token }}' -p 8200:8200 --name=dev-vault docker.io/hashicorp/vault:1.18 /bin/sh -c 'vault server -dev & tail -f /dev/null'"
+
+    - name: Check if Vault container exists
+      ansible.builtin.command: "podman inspect dev-vault"
+      register: vault_container
+      failed_when: vault_container.rc not in [0, 1]  # 0 = exists, 1 = does not exist
+      changed_when: false
+
+    - name: Create and run Vault container
+      ansible.builtin.shell: |
+        podman run --cap-add=IPC_LOCK -d \
+        -e "VAULT_DEV_ROOT_TOKEN_ID={{ vault_root_token }}" \
+        -p 8200:8200 \
+        --name=dev-vault \
+        docker.io/hashicorp/vault:1.18 \
+        /bin/sh -c "vault server -dev & tail -f /dev/null"
+      when: vault_container.rc == 1
+
+    - name: Ensure Vault container is running
+      ansible.builtin.command: "podman start dev-vault"
+      when: vault_container.rc == 0
   when: tags.group == "webserver"
