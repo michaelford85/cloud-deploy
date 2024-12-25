@@ -57,7 +57,7 @@
           amazon.aws.s3_object:
             bucket: "{{ aws_s3_bucket}}"
             object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
-            state: absent
+            mode: delobj
         
         # - name: delete flat-file public key
         #   ansible.builtin.file:
@@ -74,7 +74,7 @@
           amazon.aws.s3_object:
             bucket: "{{ aws_s3_bucket}}"
             object: "{{ aws_s3_project_name }}"
-            state: absent
+            mode: delobj
       when: cloud_provider == "aws"
 
     - name: Teardown GCP Instances
