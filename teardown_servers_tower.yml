@@ -30,7 +30,7 @@
           with_items: "{{ instance_info | json_query('instances[*].instance_id')  }}"
 
         - name: "Terminate Instances for Application {{ application }}"
-          amazon.aws.ec2:
+          amazon.aws.ec2_instance:
             state: absent
             instance_ids: "{{ ec2_instance_ids }}"
             wait: "{{ ec2_wait }}"
@@ -43,14 +43,32 @@
             name: "{{ ec2_prefix }}-key"
             state: absent
 
-        - name: delete flat-file private key
-          ansible.builtin.file:
-            path: "{{ working_dir }}/{{ ec2_prefix }}-key-private.pem"
+        # - name: delete flat-file private key
+        #   ansible.builtin.file:
+        #     path: "{{ working_dir }}/{{ ec2_prefix }}-key-private.pem"
+        #     state: absent
+    
+        - name: delete private key in s3
+          amazon.aws.s3:
+            bucket: "{{ aws_s3_bucket}}"
+            object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
             state: absent
         
-        - name: delete flat-file public key
-          ansible.builtin.file:
-            path: "{{ working_dir }}/{{ ec2_prefix }}-key.pub"
+        # - name: delete flat-file public key
+        #   ansible.builtin.file:
+        #     path: "{{ working_dir }}/{{ ec2_prefix }}-key.pub"
+        #     state: absent
+
+        - name: delete public key in s3
+          amazon.aws.s3:
+            bucket: "{{ aws_s3_bucket}}"
+            object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key.pub"
+            state: absent
+
+        - name: "delete s3 bucket folder {{ aws_s3_project_name }}"
+          amazon.aws.s3:
+            bucket: "{{ aws_s3_bucket}}"
+            object: "{{ aws_s3_project_name }}"
             state: absent
       when: cloud_provider == "aws"
 
