@@ -26,9 +26,9 @@
       gpgkey: https://download.docker.com/linux/centos/gpg
     become: yes
 
-  - name: Clean DNF cache
-    ansible.builtin.command: dnf clean all
-    become: yes
+  # - name: Clean DNF cache
+  #   ansible.builtin.command: dnf clean all
+  #   become: yes
 
   # - name: Make DNF cache
   #   ansible.builtin.command: dnf makecache
