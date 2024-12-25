@@ -27,19 +27,19 @@
     become: yes
 
   - name: Clean DNF cache
-    command: dnf clean all
+    ansible.builtin.command: dnf clean all
     args:
       warn: false
     become: yes
 
   - name: Make DNF cache
-    command: dnf makecache
+    ansible.builtin.command: dnf makecache
     args:
       warn: false
     become: yes
 
   - name: Install Docker packages
-    dnf:
+    ansible.builtin.dnf:
       name:
         - docker-ce
         - docker-ce-cli
@@ -50,7 +50,7 @@
     become: yes
 
   - name: Enable and start Docker service
-    systemd:
+    ansible.builtin.systemd:
       name: docker
       enabled: true
       state: started
