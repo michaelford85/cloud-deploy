@@ -5,6 +5,8 @@
   vars_files:
     - ./vars/default-vars.yml
     - ./credentials/tower_creds.yml
+    - ./credentials/aws_resources.yml
+
   vars:
     ec2_instance_ids: []
 
@@ -22,26 +24,29 @@
               instance-state-name: [ "running", "shutting-down", "stopping", "stopped" ]
           register: instance_info
 
-        - name: "Create a list of the {{ application }} Instances"
-          ansible.builtin.set_fact:
-            ec2_instance_ids: "{{ ec2_instance_ids }} + [ '{{ item }}']"
-          # TODO: https://github.com/ansible/ansible/issues/19347
-          # loop: "{{ instance_info | json_query('instances[*].instance_id')  }}"
-          with_items: "{{ instance_info | json_query('instances[*].instance_id')  }}"
+        # - name: "Create a list of the {{ application }} Instances"
+        #   ansible.builtin.set_fact:
+        #     ec2_instance_ids: "{{ ec2_instance_ids }} + [ '{{ item }}']"
+        #   # TODO: https://github.com/ansible/ansible/issues/19347
+        #   # loop: "{{ instance_info | json_query('instances[*].instance_id')  }}"
+        #   with_items: "{{ instance_info | json_query('instances[*].instance_id')  }}"
 
         - name: "Terminate Instances for Application {{ application }}"
           amazon.aws.ec2_instance:
             state: absent
-            instance_ids: "{{ ec2_instance_ids }}"
+            # instance_ids: "{{ ec2_instance_ids }}"
+            instance_ids: "{{ item }}"
             wait: "{{ ec2_wait }}"
             region: "{{ ec2_region }}"
-          when: ec2_instance_ids | length > 0
+          with_items: "{{ instance_info | json_query('instances[*].instance_id')  }}"
+          # when: ec2_instance_ids | length > 0
 
-        - name: Delete AWS SSH Public Key
+        - name: Delete AWS SSH Key Pair
           amazon.aws.ec2_key:
             region: "{{ ec2_region }}"
             name: "{{ ec2_prefix }}-key"
             state: absent
+          ignore_errors: yes
 
         # - name: delete flat-file private key
         #   ansible.builtin.file:
