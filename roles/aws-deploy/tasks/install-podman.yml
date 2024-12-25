@@ -24,16 +24,19 @@
       gpgcheck: yes
       repo_gpgcheck: yes
       gpgkey: https://download.docker.com/linux/centos/gpg
+    become: yes
 
   - name: Clean DNF cache
     command: dnf clean all
     args:
       warn: false
+    become: yes
 
   - name: Make DNF cache
     command: dnf makecache
     args:
       warn: false
+    become: yes
 
   - name: Install Docker packages
     dnf:
@@ -44,12 +47,14 @@
         - docker-buildx-plugin
         - docker-compose-plugin
       state: present
+    become: yes
 
   - name: Enable and start Docker service
     systemd:
       name: docker
       enabled: true
       state: started
+    become: yes
 
 
   - name: Add current user to the docker group
