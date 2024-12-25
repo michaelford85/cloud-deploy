@@ -61,7 +61,7 @@
   - name: Configure subuid and subgid mappings for rootless Podman
     ansible.builtin.lineinfile:
       path: "{{ item }}"
-      line: "{{ ansible_user_id }}:100000:65536"
+      line: "{{ ansible_user }}:100000:65536"
       create: yes
     with_items:
       - /etc/subuid
@@ -69,7 +69,7 @@
 
   - name: Ensure the user is part of the 'podman' group
     ansible.builtin.user:
-      name: "{{ ansible_user_id }}"
+      name: "{{ ansible_user }}"
       groups: podman
       append: yes
 
