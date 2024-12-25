@@ -1,6 +1,3 @@
-#How to install docker CE in RHEL8
-#https://linuxconfig.org/how-to-install-docker-in-rhel-8
-#Solves issue of containerd.io > 1.2.0-3.el7 dependency
 ---
 - block:
   - name: Remove docker directory
@@ -25,14 +22,6 @@
       repo_gpgcheck: yes
       gpgkey: https://download.docker.com/linux/centos/gpg
     become: yes
-
-  # - name: Clean DNF cache
-  #   ansible.builtin.command: dnf clean all
-  #   become: yes
-
-  # - name: Make DNF cache
-  #   ansible.builtin.command: dnf makecache
-  #   become: yes
 
   - name: Install Docker packages
     ansible.builtin.dnf:
@@ -72,57 +61,4 @@
     ansible.builtin.debug:
       var: docker_test_result.stdout
 
-  
-
-  # - name: install the 'Container tools' package group
-  #   ansible.builtin.dnf:
-  #     name: "@container-tools"
-  #     state: present
-  #   become: yes
-
-  # - name: install podman
-  #   ansible.builtin.dnf:
-  #     name: podman
-  #     state: present
-  #   become: yes
-
-  # - name: Enable and Start the Podman service
-  #   ansible.builtin.systemd_service:
-  #     name: podman
-  #     enabled: true
-  #     state: started
-  #   become: yes
-  
-  # - name: Configure subuid and subgid mappings for rootless Podman
-  #   ansible.builtin.lineinfile:
-  #     path: "{{ item }}"
-  #     line: "{{ ansible_user }}:100000:65536"
-  #     create: yes
-  #   with_items:
-  #     - /etc/subuid
-  #     - /etc/subgid
-  #   become: yes
-
-  # - name: Ensure the 'podman' group exists
-  #   ansible.builtin.group:
-  #     name: podman
-  #     state: present
-  #   become: yes
-
-  # - name: Ensure the user is part of the 'podman' group
-  #   ansible.builtin.user:
-  #     name: "{{ ansible_user }}"
-  #     groups: podman
-  #     append: yes
-  #   become: yes
-
-  # - name: Test Podman by running a container
-  #   ansible.builtin.command:
-  #     cmd: podman run docker.io/hello-world
-  #   register: podman_test
-  #   failed_when: "'Hello from Docker!' not in podman_test.stdout"
-
-  # - name: Debug Podman test output
-  #   ansible.builtin.debug:
-  #     msg: "Podman test output: {{ podman_test.stdout }}"
   when: tags.group == "webserver"

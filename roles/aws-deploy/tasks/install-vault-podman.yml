@@ -1,56 +1,5 @@
 ---
 - block:
-
-    # - name: Ensure docker python package is installed
-    #   pip:
-    #     name: docker
-    #     state: present
-    #   become: yes
-
-    # - name: Create vault container
-    #   docker_container:
-    #     name: vault
-    #     image: vault
-    #     env:
-    #       VAULT_DEV_ROOT_TOKEN_ID: "{{ vault_root_token }}"
-    #     published_ports:
-    #       - 8200:8200
-
-    # - name: Create vault container
-    #   containers.podman.podman_container:
-    #     name: vault
-    #     image: vault
-    #     env:
-    #       VAULT_DEV_ROOT_TOKEN_ID: "{{ vault_root_token }}"
-    #     exposed_ports:
-    #       - 8200
-    #     published_ports:
-    #       - 8200:8200
-    #     state: started
-    #     restart_policy: always
-
-    # - name: Create vault container
-    #   ansible.builtin.shell: "podman run --cap-add=IPC_LOCK -d -e 'VAULT_DEV_ROOT_TOKEN_ID={{ vault_root_token }}' -p 8200:8200 --name=dev-vault docker.io/hashicorp/vault:1.18 /bin/sh -c 'vault server -dev & tail -f /dev/null'"
-
-    # - name: Check if Vault container exists
-    #   ansible.builtin.command: "podman inspect dev-vault"
-    #   register: vault_container
-    #   failed_when: vault_container.rc not in [0, 1, 125]  # 0 = exists, 1 = does not exist
-    #   changed_when: false
-
-    # - name: Create and run Vault container
-    #   ansible.builtin.shell: |
-    #     podman run --cap-add=IPC_LOCK -d \
-    #     -e "VAULT_DEV_ROOT_TOKEN_ID={{ vault_root_token }}" \
-    #     -p 8200:8200 \
-    #     --name=dev-vault \
-    #     docker.io/hashicorp/vault:1.18 \
-    #     /bin/sh -c "vault server -dev & tail -f /dev/null"
-    #   when: vault_container.rc == 1 or vault_container.rc == 125
-
-    # - name: Ensure Vault container is running
-    #   ansible.builtin.command: "podman start dev-vault"
-    #   when: vault_container.rc == 0
     
     - name: Check if the dev-vault container exists
       community.docker.docker_container_info:
@@ -81,7 +30,7 @@
         method: GET
         return_content: yes
       register: vault_health
-      retries: 10
+      retries: 20
       delay: 5
       until: vault_health.status == 200
   when: tags.group == "webserver"
