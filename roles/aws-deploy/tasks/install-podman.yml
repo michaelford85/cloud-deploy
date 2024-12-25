@@ -66,17 +66,20 @@
     with_items:
       - /etc/subuid
       - /etc/subgid
+    become: yes
+
+  - name: Ensure the 'podman' group exists
+    ansible.builtin.group:
+      name: podman
+      state: present
+    become: yes
 
   - name: Ensure the user is part of the 'podman' group
     ansible.builtin.user:
       name: "{{ ansible_user }}"
       groups: podman
       append: yes
-
-  - name: Ensure the 'podman' group exists
-    ansible.builtin.group:
-      name: podman
-      state: present
+    become: yes
 
   - name: Test Podman by running a container
     ansible.builtin.command:
