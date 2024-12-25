@@ -61,27 +61,27 @@
     - ansible.builtin.debug:
         var: vault_container_info
 
-    # - name: Run Vault container with specified configuration
-    #   community.docker.docker_container:
-    #     name: dev-vault
-    #     image: "docker.io/hashicorp/vault:{{ vault_version }}"
-    #     state: started
-    #     detach: true
-    #     published_ports:
-    #       - "8200:8200"
-    #     env:
-    #       VAULT_DEV_ROOT_TOKEN_ID: "{{ vault_root_token }}"
-    #     capabilities:
-    #       - "IPC_LOCK"
-    #   when: vault_container_info.container.exists == false
+    - name: Run Vault container with specified configuration
+      community.docker.docker_container:
+        name: dev-vault
+        image: "docker.io/hashicorp/vault:{{ vault_version }}"
+        state: started
+        detach: true
+        published_ports:
+          - "8200:8200"
+        env:
+          VAULT_DEV_ROOT_TOKEN_ID: "{{ vault_root_token }}"
+        capabilities:
+          - "IPC_LOCK"
+      when: vault_container_info.exists == false
     
-    # - name: Wait for the Vault container to be available
-    #   ansible.builtin.uri:
-    #     url: "http://{{ ansible_host }}:8200/v1/sys/health"
-    #     method: GET
-    #     return_content: yes
-    #   register: vault_health
-    #   retries: 10
-    #   delay: 5
-    #   until: vault_health.status == 200
+    - name: Wait for the Vault container to be available
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8200/v1/sys/health"
+        method: GET
+        return_content: yes
+      register: vault_health
+      retries: 10
+      delay: 5
+      until: vault_health.status == 200
   when: tags.group == "webserver"
