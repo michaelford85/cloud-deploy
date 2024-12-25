@@ -73,7 +73,7 @@
               "max_lease_ttl": "720h",
               "ui": true
             }
-        cap_add:
+        capabilities:
           - IPC_LOCK
         restart_policy: always
   when: tags.group == "webserver"
