@@ -49,7 +49,7 @@
         #     state: absent
     
         - name: delete private key in s3
-          amazon.aws.s3:
+          amazon.aws.s3_object:
             bucket: "{{ aws_s3_bucket}}"
             object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
             state: absent
@@ -60,13 +60,13 @@
         #     state: absent
 
         - name: delete public key in s3
-          amazon.aws.s3:
+          amazon.aws.s3_object:
             bucket: "{{ aws_s3_bucket}}"
             object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key.pub"
             state: absent
 
         - name: "delete s3 bucket folder {{ aws_s3_project_name }}"
-          amazon.aws.s3:
+          amazon.aws.s3_object:
             bucket: "{{ aws_s3_bucket}}"
             object: "{{ aws_s3_project_name }}"
             state: absent
