@@ -1,11 +1,14 @@
 ---
 linux_users:
- - username: jarcher
- - username: rapril
- - username: cpike
- - username: jkirk
- - username: jpicard
- - username: bsisko
- - username: kjaneway
+ - username: jonathan_archer
+ - username: robert_april
+ - username: christopher_pike
+ - username: jim_kirk
+ - username: jeanluc_picard
+ - username: william_riker
+ - username: ben_sisko
+ - username: katherine_janeway
+ - username: carol_freeman
+ - username: seven_of_nine
  - username: saru
- - username: mburnham
+ - username: michael_burnham

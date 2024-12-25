@@ -51,7 +51,7 @@
 
 - name: Add key value pair secrets engine to vault
   ansible.builtin.uri:
-    url: "http://{{ vault_hostname }}:8200/v1/sys/mounts/rhel"
+    url: "http://{{ vault_hostname }}:8200/v1/sys/mounts/captains"
     method: POST
     body_format: json
     body:
@@ -72,7 +72,7 @@
 
 - name: Add user ssh keys to secrets engine
   ansible.builtin.uri:
-    url: "http://{{ vault_hostname }}:8200/v1/rhel/users"
+    url: "http://{{ vault_hostname }}:8200/v1/captains/users"
     method: POST
     src: /runner/linux_users.json
     headers:
