@@ -28,14 +28,10 @@
 
   - name: Clean DNF cache
     ansible.builtin.command: dnf clean all
-    args:
-      warn: false
     become: yes
 
   - name: Make DNF cache
     ansible.builtin.command: dnf makecache
-    args:
-      warn: false
     become: yes
 
   - name: Install Docker packages
