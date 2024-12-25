@@ -57,6 +57,12 @@
     #   ansible.builtin.command: "podman start dev-vault"
     #   when: vault_container.rc == 0
     
+    - name: Check if the dev-vault container exists
+      community.docker.docker_container_info:
+        name: dev-vault
+      register: vault_container_info
+      failed_when: false
+
     - name: Run Vault container with specified configuration
       community.docker.docker_container:
         name: dev-vault
@@ -69,4 +75,15 @@
           VAULT_DEV_ROOT_TOKEN_ID: "{{ vault_root_token }}"
         capabilities:
           - "IPC_LOCK"
+      when: vault_container_info.container is not defined
+    
+    - name: Wait for the Vault container to be available
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8200/v1/sys/health"
+        method: GET
+        return_content: yes
+      register: vault_health
+      retries: 10
+      delay: 5
+      until: vault_health.status == 200
   when: tags.group == "webserver"
