@@ -73,6 +73,11 @@
       groups: podman
       append: yes
 
+  - name: Ensure the 'podman' group exists
+    ansible.builtin.group:
+      name: podman
+      state: present
+
   - name: Test Podman by running a container
     ansible.builtin.command:
       cmd: podman run hello-world
