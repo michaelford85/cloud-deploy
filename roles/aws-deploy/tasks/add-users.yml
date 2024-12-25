@@ -10,7 +10,7 @@
 #   delegate_to: localhost
 #   run_once: yes
 
-- name: Copy private key to /tmp directory
+- name: Copy private key to /runner directory
   amazon.aws.s3_object:
     bucket: "{{ aws_s3_bucket }}"
     object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
@@ -24,7 +24,7 @@
 #   delegate_to: localhost
 #   run_once: yes
 
-- name: Copy public key to /tmp directory
+- name: Copy public key to /runner directory
   amazon.aws.s3_object:
     bucket: "{{ aws_s3_bucket }}"
     object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key.pub"
@@ -32,6 +32,19 @@
     mode: get
   delegate_to: localhost
   run_once: yes
+
+- name: Slurp file contents for public key
+  ansible.builtin.slurp:
+    src: "{{ public_key_path }}"
+  register: file_content
+  
+- name: Decode file content
+  set_fact:
+    public_key_content_decoded: "{{ file_content['content'] | b64decode }}"
+
+- name: Debug the content
+  debug:
+    msg: "{{ public_key_content_decoded }}"
 
 - name: Create vault_hostname.yml template
   ansible.builtin.template:
@@ -82,6 +95,7 @@
     headers:
       X-Vault-Token: "{{ vault_root_token }}"
     status_code: 200, 204
+  delegate_to: localhost
   run_once: yes
 
 - name: Delete linux_users.json
@@ -142,7 +156,7 @@
     ansible.posix.authorized_key:
       user: "{{ item.username }}"
       state: present
-      key: "{{ lookup('file', '{{ public_key_path }}"
+      key: "{{ public_key_content_decoded }}"
     with_items: "{{ linux_users }}"
     become: yes
 
