@@ -59,14 +59,14 @@
     
     - name: Run Vault container with specified configuration
       community.docker.docker_container:
-      name: dev-vault
-      image: "docker.io/hashicorp/vault:{{ vault_version }}"
-      state: started
-      detach: true
-      published_ports:
-        - "8200:8200"
-      env:
-        VAULT_DEV_ROOT_TOKEN_ID: "{{ vault_root_token }}"
-      capabilities:
-        - "IPC_LOCK"
+        name: dev-vault
+        image: "docker.io/hashicorp/vault:{{ vault_version }}"
+        state: started
+        detach: true
+        published_ports:
+          - "8200:8200"
+        env:
+          VAULT_DEV_ROOT_TOKEN_ID: "{{ vault_root_token }}"
+        capabilities:
+          - "IPC_LOCK"
   when: tags.group == "webserver"
