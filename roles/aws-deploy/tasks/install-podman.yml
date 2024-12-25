@@ -83,7 +83,7 @@
 
   - name: Test Podman by running a container
     ansible.builtin.command:
-      cmd: podman run hello-world
+      cmd: podman run docker.io/hello-world
     register: podman_test
     failed_when: "'Hello from Docker!' not in podman_test.stdout"
 
