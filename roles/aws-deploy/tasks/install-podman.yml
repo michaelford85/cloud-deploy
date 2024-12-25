@@ -50,16 +50,36 @@
       name: podman
       state: present
     become: yes
-  
-  - name: Enable the Podman service
+
+  - name: Enable and Start the Podman service
     ansible.builtin.systemd_service:
       name: podman
       enabled: true
-    become: yes
-
-  - name: Start the Podman service
-    ansible.builtin.systemd_service:
-      name: podman
       state: started
     become: yes
+  
+  - name: Configure subuid and subgid mappings for rootless Podman
+    ansible.builtin.lineinfile:
+      path: "{{ item }}"
+      line: "{{ ansible_user_id }}:100000:65536"
+      create: yes
+    with_items:
+      - /etc/subuid
+      - /etc/subgid
+
+  - name: Ensure the user is part of the 'podman' group
+    ansible.builtin.user:
+      name: "{{ ansible_user_id }}"
+      groups: podman
+      append: yes
+
+  - name: Test Podman by running a container
+    ansible.builtin.command:
+      cmd: podman run hello-world
+    register: podman_test
+    failed_when: "'Hello from Docker!' not in podman_test.stdout"
+
+  - name: Debug Podman test output
+    ansible.builtin.debug:
+      msg: "Podman test output: {{ podman_test.stdout }}"
   when: tags.group == "webserver"
