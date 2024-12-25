@@ -51,7 +51,7 @@
         --name=dev-vault \
         docker.io/hashicorp/vault:1.18 \
         /bin/sh -c "vault server -dev & tail -f /dev/null"
-      when: vault_container.rc == 1
+      when: vault_container.rc == 1 or vault_container.rc == 125
 
     - name: Ensure Vault container is running
       ansible.builtin.command: "podman start dev-vault"
