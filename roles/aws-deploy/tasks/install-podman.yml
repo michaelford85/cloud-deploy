@@ -30,9 +30,9 @@
     ansible.builtin.command: dnf clean all
     become: yes
 
-  - name: Make DNF cache
-    ansible.builtin.command: dnf makecache
-    become: yes
+  # - name: Make DNF cache
+  #   ansible.builtin.command: dnf makecache
+  #   become: yes
 
   - name: Install Docker packages
     ansible.builtin.dnf:
@@ -51,7 +51,6 @@
       enabled: true
       state: started
     become: yes
-
 
   - name: Add current user to the docker group
     ansible.builtin.user:
