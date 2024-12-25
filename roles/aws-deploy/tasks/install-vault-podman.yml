@@ -40,7 +40,7 @@
     - name: Check if Vault container exists
       ansible.builtin.command: "podman inspect dev-vault"
       register: vault_container
-      failed_when: vault_container.rc not in [0, 1]  # 0 = exists, 1 = does not exist
+      failed_when: vault_container.rc not in [0, 1, 125]  # 0 = exists, 1 = does not exist
       changed_when: false
 
     - name: Create and run Vault container
