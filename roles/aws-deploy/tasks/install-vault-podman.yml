@@ -35,5 +35,6 @@
     #     restart_policy: always
 
     - name: Create vault container
-      ansible.builtin.command: "podman run --cap-add=IPC_LOCK -e 'VAULT_DEV_ROOT_TOKEN_ID={{ vault_root_token }}' -d -p 8200:8200 --name=dev-vault docker.io/hashicorp/vault:{{ vault_version }}"
+      # ansible.builtin.command: "podman run --cap-add=IPC_LOCK -e 'VAULT_DEV_ROOT_TOKEN_ID={{ vault_root_token }}' -d -p 8200:8200 --name=dev-vault docker.io/hashicorp/vault:{{ vault_version }}"
+      ansible.builtin.shell: "podman run --cap-add=IPC_LOCK -d -e 'VAULT_DEV_ROOT_TOKEN_ID={{ vault_root_token }}' -p 8200:8200 --name=dev-vault docker.io/hashicorp/vault:1.18"
   when: tags.group == "webserver"

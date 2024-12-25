@@ -46,11 +46,11 @@
   delegate_to: localhost
   run_once: yes
 
-- name: Debug the content
-  debug:
-    msg: "{{ public_key_content_decoded }}"
-  delegate_to: localhost
-  run_once: yes
+# - name: Debug the content
+#   debug:
+#     msg: "{{ public_key_content_decoded }}"
+#   delegate_to: localhost
+#   run_once: yes
 
 - name: Create vault_hostname.yml template
   ansible.builtin.template:
