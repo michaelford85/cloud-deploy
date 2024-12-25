@@ -1,10 +1,5 @@
 ---
 - block:
-    - name: Ensure pip is installed
-      ansible.builtin.dnf:
-        name: python3-pip
-        state: latest
-      become: yes
 
     # - name: Ensure docker python package is installed
     #   pip:
@@ -75,7 +70,7 @@
           VAULT_DEV_ROOT_TOKEN_ID: "{{ vault_root_token }}"
         capabilities:
           - "IPC_LOCK"
-      when: vault_container_info.container is not defined
+      when: vault_container_info.container.exists == false
     
     - name: Wait for the Vault container to be available
       ansible.builtin.uri:
