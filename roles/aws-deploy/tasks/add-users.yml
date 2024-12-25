@@ -37,14 +37,20 @@
   ansible.builtin.slurp:
     src: "{{ public_key_path }}"
   register: file_content
+  delegate_to: localhost
+  run_once: yes
   
 - name: Decode file content
   set_fact:
     public_key_content_decoded: "{{ file_content['content'] | b64decode }}"
+  delegate_to: localhost
+  run_once: yes
 
 - name: Debug the content
   debug:
     msg: "{{ public_key_content_decoded }}"
+  delegate_to: localhost
+  run_once: yes
 
 - name: Create vault_hostname.yml template
   ansible.builtin.template:
