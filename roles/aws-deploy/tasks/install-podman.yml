@@ -3,41 +3,92 @@
 #Solves issue of containerd.io > 1.2.0-3.el7 dependency
 ---
 - block:
-  # - name: Remove docker directory
-  #   ansible.builtin.file:
-  #     path: /var/lib/docker/
-  #     state: absent
-  #   become: yes
+  - name: Remove docker directory
+    ansible.builtin.file:
+      path: /var/lib/docker/
+      state: absent
+    become: yes
 
-  # - name: Remove existing Docker repositories from /etc/yum.repos.d/
-  #   ansible.builtin.file:
-  #     path: /etc/yum.repos.d/docker*.repo
-  #     state: absent
-  #   become: yes
+  - name: Remove existing Docker repositories from /etc/yum.repos.d/
+    ansible.builtin.file:
+      path: /etc/yum.repos.d/docker*.repo
+      state: absent
+    become: yes
 
-  # - name: Remove docker if installed from CentOS repo
-  #   ansible.builtin.dnf:
-  #     name: "{{ packages }}"
-  #     state: removed
-  #   become: yes
-  #   vars:
-  #     packages:
-  #       - docker
-  #       - docker-client
-  #       - docker-client-latest
-  #       - docker-common
-  #       - docker-latest
-  #       - docker-latest-logrotate
-  #       - docker-logrotate
-  #       - docker-engine
-  #       - docker-ce
-  #       - docker-ce-cli
+  - name: Remove docker if installed from CentOS repo
+    ansible.builtin.dnf:
+      name: "{{ packages }}"
+      state: removed
+    become: yes
+    vars:
+      packages:
+        - docker
+        - docker-client
+        - docker-client-latest
+        - docker-common
+        - docker-latest
+        - docker-latest-logrotate
+        - docker-logrotate
+        - docker-engine
+        - docker-ce
+        - docker-ce-cli
 
-  # - name: Uninstall the latest available containerd.io package manually
-  #   ansible.builtin.dnf:
-  #     name: containerd.io-1.2.6-3.3.el7.x86_64
-  #     state: removed
-  #   become: yes
+  - name: Uninstall the latest available containerd.io package manually
+    ansible.builtin.dnf:
+      name: containerd.io-1.2.6-3.3.el7.x86_64
+      state: removed
+    become: yes
+
+  - name: Add Docker CE repository
+    ansible.builtin.yum_repository:
+      name: docker-ce
+      description: Docker CE Repository
+      baseurl: https://download.docker.com/linux/centos/docker-ce.repo
+      enabled: yes
+      gpgcheck: yes
+      repo_gpgcheck: yes
+      gpgkey: https://download.docker.com/linux/centos/gpg
+    become: yes
+
+  - name: Install Docker packages
+    ansible.builtin.dnf:
+      name:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
+      state: present
+    become: yes
+
+  - name: Enable and start Docker service
+    ansible.builtin.systemd:
+      name: docker
+      enabled: true
+      state: started
+    become: yes
+
+  - name: Add current user to the docker group
+    ansible.builtin.user:
+      name: "{{ ansible_user }}"
+      groups: docker
+      append: true
+    become: yes
+
+  - name: Reload group membership
+    meta: reset_connection
+    become: yes
+
+  - name: Test Docker installation with hello-world container
+    command: docker run hello-world
+    register: docker_test_result
+    ignore_errors: yes
+
+  - name: Print result of hello-world test
+    ansible.builtin.debug:
+      var: docker_test_result.stdout
+
+  
 
   # - name: install the 'Container tools' package group
   #   ansible.builtin.dnf:
@@ -45,49 +96,49 @@
   #     state: present
   #   become: yes
 
-  - name: install podman
-    ansible.builtin.dnf:
-      name: podman
-      state: present
-    become: yes
+  # - name: install podman
+  #   ansible.builtin.dnf:
+  #     name: podman
+  #     state: present
+  #   become: yes
 
-  - name: Enable and Start the Podman service
-    ansible.builtin.systemd_service:
-      name: podman
-      enabled: true
-      state: started
-    become: yes
+  # - name: Enable and Start the Podman service
+  #   ansible.builtin.systemd_service:
+  #     name: podman
+  #     enabled: true
+  #     state: started
+  #   become: yes
   
-  - name: Configure subuid and subgid mappings for rootless Podman
-    ansible.builtin.lineinfile:
-      path: "{{ item }}"
-      line: "{{ ansible_user }}:100000:65536"
-      create: yes
-    with_items:
-      - /etc/subuid
-      - /etc/subgid
-    become: yes
+  # - name: Configure subuid and subgid mappings for rootless Podman
+  #   ansible.builtin.lineinfile:
+  #     path: "{{ item }}"
+  #     line: "{{ ansible_user }}:100000:65536"
+  #     create: yes
+  #   with_items:
+  #     - /etc/subuid
+  #     - /etc/subgid
+  #   become: yes
 
-  - name: Ensure the 'podman' group exists
-    ansible.builtin.group:
-      name: podman
-      state: present
-    become: yes
+  # - name: Ensure the 'podman' group exists
+  #   ansible.builtin.group:
+  #     name: podman
+  #     state: present
+  #   become: yes
 
-  - name: Ensure the user is part of the 'podman' group
-    ansible.builtin.user:
-      name: "{{ ansible_user }}"
-      groups: podman
-      append: yes
-    become: yes
+  # - name: Ensure the user is part of the 'podman' group
+  #   ansible.builtin.user:
+  #     name: "{{ ansible_user }}"
+  #     groups: podman
+  #     append: yes
+  #   become: yes
 
-  - name: Test Podman by running a container
-    ansible.builtin.command:
-      cmd: podman run docker.io/hello-world
-    register: podman_test
-    failed_when: "'Hello from Docker!' not in podman_test.stdout"
+  # - name: Test Podman by running a container
+  #   ansible.builtin.command:
+  #     cmd: podman run docker.io/hello-world
+  #   register: podman_test
+  #   failed_when: "'Hello from Docker!' not in podman_test.stdout"
 
-  - name: Debug Podman test output
-    ansible.builtin.debug:
-      msg: "Podman test output: {{ podman_test.stdout }}"
+  # - name: Debug Podman test output
+  #   ansible.builtin.debug:
+  #     msg: "Podman test output: {{ podman_test.stdout }}"
   when: tags.group == "webserver"

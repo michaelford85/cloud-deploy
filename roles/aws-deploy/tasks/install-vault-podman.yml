@@ -37,23 +37,43 @@
     # - name: Create vault container
     #   ansible.builtin.shell: "podman run --cap-add=IPC_LOCK -d -e 'VAULT_DEV_ROOT_TOKEN_ID={{ vault_root_token }}' -p 8200:8200 --name=dev-vault docker.io/hashicorp/vault:1.18 /bin/sh -c 'vault server -dev & tail -f /dev/null'"
 
-    - name: Check if Vault container exists
-      ansible.builtin.command: "podman inspect dev-vault"
-      register: vault_container
-      failed_when: vault_container.rc not in [0, 1, 125]  # 0 = exists, 1 = does not exist
-      changed_when: false
+    # - name: Check if Vault container exists
+    #   ansible.builtin.command: "podman inspect dev-vault"
+    #   register: vault_container
+    #   failed_when: vault_container.rc not in [0, 1, 125]  # 0 = exists, 1 = does not exist
+    #   changed_when: false
 
-    - name: Create and run Vault container
-      ansible.builtin.shell: |
-        podman run --cap-add=IPC_LOCK -d \
-        -e "VAULT_DEV_ROOT_TOKEN_ID={{ vault_root_token }}" \
-        -p 8200:8200 \
-        --name=dev-vault \
-        docker.io/hashicorp/vault:1.18 \
-        /bin/sh -c "vault server -dev & tail -f /dev/null"
-      when: vault_container.rc == 1 or vault_container.rc == 125
+    # - name: Create and run Vault container
+    #   ansible.builtin.shell: |
+    #     podman run --cap-add=IPC_LOCK -d \
+    #     -e "VAULT_DEV_ROOT_TOKEN_ID={{ vault_root_token }}" \
+    #     -p 8200:8200 \
+    #     --name=dev-vault \
+    #     docker.io/hashicorp/vault:1.18 \
+    #     /bin/sh -c "vault server -dev & tail -f /dev/null"
+    #   when: vault_container.rc == 1 or vault_container.rc == 125
 
-    - name: Ensure Vault container is running
-      ansible.builtin.command: "podman start dev-vault"
-      when: vault_container.rc == 0
+    # - name: Ensure Vault container is running
+    #   ansible.builtin.command: "podman start dev-vault"
+    #   when: vault_container.rc == 0
+    
+    - name: Run Vault container with specified configuration
+      community.docker.docker_container:
+        name: dev-vault
+        image: docker.io/hashicorp/vault
+        state: started
+        published_ports:
+          - "8200:8200"
+        env:
+          VAULT_LOCAL_CONFIG: >
+            {
+              "storage": {"file": {"path": "/vault/file"}},
+              "listener": [{"tcp": {"address": "0.0.0.0:8200", "tls_disable": true}}],
+              "default_lease_ttl": "168h",
+              "max_lease_ttl": "720h",
+              "ui": true
+            }
+        cap_add:
+          - IPC_LOCK
+        restart_policy: always
   when: tags.group == "webserver"
