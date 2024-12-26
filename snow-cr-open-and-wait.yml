@@ -116,8 +116,8 @@
         assignment_group: "CAB Approval"
       when: from_snow|bool
       loop:
-        - "implement"
-        - "review"
+        - "authorize"
+        # - "review"
 
 
 
