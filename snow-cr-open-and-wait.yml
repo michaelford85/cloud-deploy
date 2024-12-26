@@ -5,6 +5,7 @@
     - ./credentials/snow_creds.yml
     - ./credentials/gmail_creds.yml
     - ./vars/default-vars.yml
+    - ./credentials/aws_resources.yml
   collections:
     - servicenow.itsm
 
