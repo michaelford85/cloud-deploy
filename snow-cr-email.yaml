@@ -7,8 +7,16 @@
 
   tasks:
 
+    - name: Download Private Key from S3
+      amazon.aws.s3_object:
+        bucket: "{{ aws_s3_bucket }}"
+        object: "{{ aws_s3_project_name }}/snow-change-request.yml"
+        dest: "/runner/snow-change-request.yml"
+        mode: get
+      register: download_result
+
     - name: Include Change Request artifact
-      ansible.builtin.include_vars: "{{ working_dir }}/snow-change-request.yml"
+      ansible.builtin.include_vars: "/runner/snow-change-request.yml"
       when: from_snow|bool
 
     - name: Sending an email requesting approval
