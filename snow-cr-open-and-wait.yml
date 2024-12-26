@@ -114,6 +114,7 @@
             password: "{{ SNOW_PASSWORD }}"
         sys_id: "{{ new_change_request.record.sys_id }}"
         state: "{{ item }}"
+        assignment_group: "CAB Approval"
       when: from_snow|bool
       loop:
         - "implement"
