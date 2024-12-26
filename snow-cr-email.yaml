@@ -4,6 +4,7 @@
   vars_files:
     - ./credentials/gmail_creds.yml
     - ./vars/default-vars.yml
+    - ./credentials/aws_resources.yml
 
   tasks:
 
