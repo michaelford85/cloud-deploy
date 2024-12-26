@@ -9,6 +9,17 @@
     - servicenow.itsm
 
   tasks:
+
+    - name: Create a folder for this project in the S3 bucket
+      amazon.aws.s3_object:
+        bucket: "{{ aws_s3_bucket }}"
+        object: "{{ aws_s3_project_name }}/"  # The 'key' for the folder, ends with '/'
+        region: "{{ ec2_region }}"
+        mode: put
+        force: always
+        content: ""
+      register: s3_create_folder_result
+
     - name: Create ServiceNow Change Request
       servicenow.itsm.change_request:
         instance:
@@ -35,18 +46,27 @@
     - name: Create Change Request number artifact from template
       ansible.builtin.template:
         src: ./templates/snow-change-request.j2
-        dest: "{{ working_dir }}/snow-change-request.yml"
+        dest: "/runner/snow-change-request.yml"
       run_once: yes
       delegate_to: localhost
       when: from_snow|bool
 
+    # - name: Store Change Request number artifact for later in the workflow
+    #   amazon.aws.aws_s3:
+    #     bucket: mford-cloud-deploy-bucket
+    #     object: snow-change-request.yml
+    #     src: "{{ working_dir }}/snow-change-request.yml"
+    #     mode: put
+    #   when: from_snow|bool
+
     - name: Store Change Request number artifact for later in the workflow
-      amazon.aws.aws_s3:
-        bucket: mford-cloud-deploy-bucket
-        object: snow-change-request.yml
-        src: "{{ working_dir }}/snow-change-request.yml"
+      amazon.aws.s3_object:
+        bucket: "{{ aws_s3_bucket}}"
+        object: "{{ aws_s3_project_name }}/snow-change-request.yml"
+        content: "/runner/snow-change-request.yml"
         mode: put
       when: from_snow|bool
+      # no_log: yes
 
     - name: Print out Change Request number
       ansible.builtin.debug:
