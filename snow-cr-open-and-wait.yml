@@ -64,7 +64,7 @@
       amazon.aws.s3_object:
         bucket: "{{ aws_s3_bucket}}"
         object: "{{ aws_s3_project_name }}/snow-change-request.yml"
-        content: "/runner/snow-change-request.yml"
+        content: "{{ lookup('file', '/runner/snow-change-request.yml') }}"
         mode: put
       when: from_snow|bool
       # no_log: yes
