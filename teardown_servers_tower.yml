@@ -70,6 +70,13 @@
             object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key.pub"
             mode: delobj
 
+        - name: delete ServiceNow Change Request file
+          amazon.aws.s3_object:
+            bucket: "{{ aws_s3_bucket}}"
+            object: "{{ aws_s3_project_name }}/snow-change-request.yml"
+            mode: delobj
+          when: from_snow|bool
+
         - name: "delete s3 bucket folder {{ aws_s3_project_name }}"
           amazon.aws.s3_object:
             bucket: "{{ aws_s3_bucket}}"
