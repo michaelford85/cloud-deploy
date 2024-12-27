@@ -94,7 +94,7 @@
             bucket: "{{ aws_s3_bucket }}"
             object: "{{ item.key }}"
             mode: delobj
-          with_items: "{{ s3_objects.objects }}"
+          with_items: "{{ s3_objects.s3_keys }}"
       when: cloud_provider == "aws"
 
     - name: Teardown GCP Instances
