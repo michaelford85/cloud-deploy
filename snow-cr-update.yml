@@ -16,6 +16,7 @@
         dest: "/runner/snow-change-request.yml"
         mode: get
       register: download_result
+      when: from_snow|bool
 
     - name: Include Change Request artifact
       ansible.builtin.include_vars: "/runner/snow-change-request.yml"
