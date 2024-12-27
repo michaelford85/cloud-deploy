@@ -89,10 +89,13 @@
             mode: list
           register: s3_objects
         
+        - ansible.builtin.debug:
+            var: s3_objects.s3_keys
+            
         - name: Delete objects under the folder
           amazon.aws.s3_object:
             bucket: "{{ aws_s3_bucket }}"
-            object: "{{ item.key }}"
+            object: "{{ item }}"
             mode: delobj
           with_items: "{{ s3_objects.s3_keys }}"
       when: cloud_provider == "aws"
