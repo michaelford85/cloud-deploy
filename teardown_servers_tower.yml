@@ -47,34 +47,24 @@
             name: "{{ ec2_prefix }}-key"
             state: absent
           ignore_errors: yes
-
-        # - name: delete flat-file private key
-        #   ansible.builtin.file:
-        #     path: "{{ working_dir }}/{{ ec2_prefix }}-key-private.pem"
-        #     state: absent
     
-        - name: delete private key in s3
-          amazon.aws.s3_object:
-            bucket: "{{ aws_s3_bucket}}"
-            object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
-            mode: delobj
-        
-        # - name: delete flat-file public key
-        #   ansible.builtin.file:
-        #     path: "{{ working_dir }}/{{ ec2_prefix }}-key.pub"
-        #     state: absent
+        # - name: delete private key in s3
+        #   amazon.aws.s3_object:
+        #     bucket: "{{ aws_s3_bucket}}"
+        #     object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key-private.pem"
+        #     mode: delobj
 
-        - name: delete public key in s3
-          amazon.aws.s3_object:
-            bucket: "{{ aws_s3_bucket}}"
-            object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key.pub"
-            mode: delobj
+        # - name: delete public key in s3
+        #   amazon.aws.s3_object:
+        #     bucket: "{{ aws_s3_bucket}}"
+        #     object: "{{ aws_s3_project_name }}/{{ ec2_prefix }}-key.pub"
+        #     mode: delobj
 
-        - name: delete ServiceNow Change Request file
-          amazon.aws.s3_object:
-            bucket: "{{ aws_s3_bucket}}"
-            object: "{{ aws_s3_project_name }}/snow-change-request.yml"
-            mode: delobj
+        # - name: delete ServiceNow Change Request file
+        #   amazon.aws.s3_object:
+        #     bucket: "{{ aws_s3_bucket}}"
+        #     object: "{{ aws_s3_project_name }}/snow-change-request.yml"
+        #     mode: delobj
 
         # - name: "delete s3 bucket folder {{ aws_s3_project_name }}"
         #   amazon.aws.s3_object:
@@ -91,7 +81,7 @@
         
         - ansible.builtin.debug:
             var: s3_objects.s3_keys
-            
+
         - name: Delete objects under the folder
           amazon.aws.s3_object:
             bucket: "{{ aws_s3_bucket }}"
