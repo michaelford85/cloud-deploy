@@ -76,11 +76,25 @@
             object: "{{ aws_s3_project_name }}/snow-change-request.yml"
             mode: delobj
 
-        - name: "delete s3 bucket folder {{ aws_s3_project_name }}"
+        # - name: "delete s3 bucket folder {{ aws_s3_project_name }}"
+        #   amazon.aws.s3_object:
+        #     bucket: "{{ aws_s3_bucket}}"
+        #     object: "{{ aws_s3_project_name }}"
+        #     mode: delobj
+        
+        - name: List all objects in the folder
           amazon.aws.s3_object:
-            bucket: "{{ aws_s3_bucket}}"
-            object: "{{ aws_s3_project_name }}"
+            bucket: "{{ aws_s3_bucket }}"
+            prefix: "{{ aws_s3_project_name }}/"
+            mode: list
+          register: s3_objects
+        
+        - name: Delete objects under the folder
+          amazon.aws.s3_object:
+            bucket: "{{ aws_s3_bucket }}"
+            object: "{{ item.key }}"
             mode: delobj
+          with_items: "{{ s3_objects.objects }}"
       when: cloud_provider == "aws"
 
     - name: Teardown GCP Instances
